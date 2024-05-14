@@ -1,0 +1,42 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+GREY='\033[0;90m'
+NC='\033[0m'
+
+echo -e "${GREY}Copying .env.example to .env${NC}"
+cp .env.example .env
+
+echo -e "${GREY}Prompting user for environment values${NC}"
+read -p "Enter your ETHERSCAN_API_KEY: " ETHERSCAN_API_KEY_VALUE
+while [[ -z "$ETHERSCAN_API_KEY_VALUE" ]]; do
+    echo -e "${RED}Error:${NC} ETHERSCAN_API_KEY cannot be empty."
+    read -p "Enter your ETHERSCAN_API_KEY: " ETHERSCAN_API_KEY_VALUE
+done
+
+read -p "Enter SEPOLIA_BANK_ADDRESS: " SEPOLIA_BANK_ADDRESS_VALUE
+while [[ -z "$SEPOLIA_BANK_ADDRESS_VALUE" ]]; do
+    echo -e "${RED}Error:${NC} SEPOLIA_BANK_ADDRESS cannot be empty."
+    read -p "Enter SEPOLIA_BANK_ADDRESS: " SEPOLIA_BANK_ADDRESS_VALUE
+done
+
+read -p "Enter SEPOLIA_TOKEN_ADDRESS: " SEPOLIA_TOKEN_ADDRESS_VALUE
+while [[ -z "$SEPOLIA_TOKEN_ADDRESS_VALUE" ]]; do
+    echo -e "${RED}Error:${NC} SEPOLIA_TOKEN_ADDRESS cannot be empty."
+    read -p "Enter SEPOLIA_TOKEN_ADDRESS: " SEPOLIA_TOKEN_ADDRESS_VALUE
+done
+
+sed -i "s/<YOUR_API_KEY>/$ETHERSCAN_API_KEY_VALUE/g" .env
+sed -i "s/<BANK_ADDRESS>/$SEPOLIA_BANK_ADDRESS_VALUE/g" .env
+sed -i "s/<TOKEN_ADDRESS>/$SEPOLIA_TOKEN_ADDRESS_VALUE/g" .env
+
+echo -e "${GREY}Installing dependencies${NC}"
+pnpm install
+
+echo -e "${GREY}Generating wagmi${NC}"
+pnpm wagmi generate
+
+echo -e "${GREY}Setup completed!${NC}"
+echo -e "To start the app, run 'pnpm dev'"
